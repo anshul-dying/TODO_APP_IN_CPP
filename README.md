@@ -6,11 +6,11 @@ This is a console-based TODO list manager written in C++. It allows users to:
 - View all tasks in a tabular format
 - Delete tasks by ID
 
-todo-app/
-├── todo.cpp
-├── todo.h
-├── README.md
-└── .gitignore
+todo-app/<br>
+├── todo.cpp<br>
+├── todo.h<br>
+├── README.md<br>
+└── .gitignore<br>
 
 ## 💡 Features
 
