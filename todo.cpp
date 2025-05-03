@@ -2,10 +2,65 @@
 #include <ctime>
 #include <iomanip>
 #include <vector>
+#include <fstream>
 
 #include "todo.h"
 
 int Todo::id = 0;
+
+void save_task_to_file(Todo *t)
+{
+    std::ofstream file("tasks.txt", std::ios::app);
+    file << t->get_id() << "|"
+         << t->get_task() << "|"
+         << std::put_time(t->get_start_time(), "%d %m %Y %H %M %S") << "|"
+         << std::put_time(t->get_end_time(), "%d %m %Y %H %M %S") << "\n";
+
+    file.close();
+}
+
+void load_tasks(std::vector<Todo *> &tasks)
+{
+    std::ifstream file("tasks.txt");
+    std::string line;
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string token;
+        std::vector<std::string> parts;
+        while (std::getline(iss, token, '|'))
+            parts.push_back(token);
+
+        if (parts.size() != 4)
+            continue;
+
+        Todo *t = new Todo();
+        t->set_task(parts[1]);
+
+        int d, m, y, h, mi, s;
+        std::istringstream(parts[2]) >> d >> m >> y >> h >> mi >> s;
+        t->set_start_time(d, m, y, h, mi, s);
+
+        std::istringstream(parts[3]) >> d >> m >> y >> h >> mi >> s;
+        t->set_end_time(d, m, y, h, mi, s);
+
+        tasks.push_back(t);
+    }
+    file.close();
+}
+
+void update_file(std::vector<Todo *> &tasks)
+{
+    std::ofstream file("tasks.txt", std::ios::trunc);
+    for (const auto &t : tasks)
+    {
+        file << t->get_id() << "|"
+             << t->get_task() << "|"
+             << std::put_time(t->get_start_time(), "%d %m %Y %H %M %S") << "|"
+             << std::put_time(t->get_end_time(), "%d %m %Y %H %M %S") << "\n";
+    }
+    file.close();
+}
 
 void add_task(std::vector<Todo *> &tasks)
 {
@@ -29,6 +84,8 @@ void add_task(std::vector<Todo *> &tasks)
     t->set_task(task);
 
     tasks.push_back(t);
+
+    save_task_to_file(t);
 
     std::cout << "Task added successfully";
 }
@@ -54,6 +111,7 @@ void delete_task(std::vector<Todo *> &tasks)
         if (tasks[i]->get_id() == t)
         {
             tasks.erase(tasks.begin() + i);
+            update_file(tasks);
         }
     }
 
@@ -87,6 +145,7 @@ void display_task(std::vector<Todo *> &tasks)
 int main()
 {
     std::vector<Todo *> tasks;
+    load_tasks(tasks);
     int option;
     do
     {

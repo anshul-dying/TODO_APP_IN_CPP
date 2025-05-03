@@ -67,4 +67,7 @@ public:
     {
         return &this->end;
     }
+
+public:
+    ~Todo() = default;
 };
